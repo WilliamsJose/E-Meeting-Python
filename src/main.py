@@ -1,65 +1,131 @@
 import json
-f = "./db.json"
-
+from getpass import getpass
+import os
+from time import sleep
+f = "./DataBase/db.json"
 
 def main():
+    clear()
     principal()
 
 
+
+def clear():
+    os.system("cls")
+
+
+
 def principal():
-    print("\nBem vindo!")
+    clear()
+    print("Bem vindo!")
     print("Qual menu deseja ver? ")
     
     text = "\n1 - Usuário Comum. \n2 - Coordenador. \n3 - Gestor de Recursos. \n0 - Sair \nOpção: "
     opt = int(input(text))
 
-    while opt != 0:
-        if opt == 1:
-            menuUsuarioComum()
-        elif opt == 2:
-            menuCoordenador()
-        elif opt == 3:
-            menuGestorDeRecursos()
-        elif opt == 4:
-            cadastro()
-        elif opt == 5:
-            listaUsuarios()
-        else:
-            print("Opção inválida! Tente novamente.")
-        opt = int(input(text))
+    if opt == 1:
+        menuUsuarioComum()
+    elif opt == 2:
+        menuCoordenador()
+    elif opt == 3:
+        menuGestorDeRecursos()
+    elif opt == 4:
+        cadastroComum()
+    elif opt == 5:
+        listaUsuarios()
+    elif opt == 0:
+        clear()
+        print("Goodbye!")
+        sleep(1)
+        clear()
+        exit
+    else:
+        print("\nOpção inválida! Tente novamente.")
+        sleep(1)
+        principal()
+    
 
 
 def menuUsuarioComum():
-    print("\n--Usuário--")
-    print("O que deseja fazer?")
+    clear()
+    print("--Usuário--")
+    print("Faça login ou Cadastre-se")
     
     text = "\n1 - Cadastrar-se. \n2 - Entrar. \n0 - Voltar ao Menu Anterior \nOpção: "
     opt = int(input(text))
 
-    while opt != 0:
-        if opt == 1:
-            cadastro()
-        elif opt == 2:
-            login()
-        elif opt == 3:
-            principal()
-        else:
-            print("\nOpção inválida! Tente novamente.")
-        opt = int(input(text))
+    if opt == 1:
+        cadastroComum()
+    elif opt == 2:
+        login("Comum")
+    elif opt == 0:
+        principal()
+    else:
+        print("\nOpção inválida! Tente novamente.")
+        sleep(1)
+        menuUsuarioComum()
+
 
 
 def menuCoordenador():
-    print("\n--Coordenador--")
+    clear()
+    print("--Coordenador--")
+    text = "1 - Entrar. \n0 - Voltar ao Menu Anterior. \nOpção: "
+
+    opt = int(input(text))
+
+    if opt == 1:
+        login("Coordenador")
+    elif opt == 0:
+        principal()
+    else:
+        print("\nOpção inválida, Tente novamente.")
+        sleep(1)
+        menuCoordenador()
+
+
 
 def menuGestorDeRecursos():
-    print("\n--Coordenador--")
+    clear()
+    print("--Gestor de Recursos--")
+    text = "1 - Entrar. \n0 - Voltar ao Menu Anterior. \nOpção: "
+
+    opt = int(input(text))
+
+    if opt == 1:
+        login("Gestor de Recursos")
+    elif opt == 0:
+        principal()
+    else:
+        print("\nOpção inválida, Tente novamente.")
+        sleep(1)
+        menuGestorDeRecursos()
+
+
+
             
-            
-def cadastro():
-    nome = input("Digite o Nome: ")
-    matricula = input("Digite a Matrícula: ")
-    senha = input("Digite a Senha: ")
-    pessoa = {"nome": nome, "senha": senha, "matricula": matricula}
+def cadastroComum():
+    clear()
+    nome = input("Digite seu Nome: ")
+    cpf = input("Digite seu CPF: ")
+    matricula = input("Digite sua Matrícula: ")
+    telefone = input("Digite seu Telefone: ")
+    senha = getpass("Digite a Senha: ")
+    confirmaSenha = getpass("Confirme a Senha: ")
+    permissao = "Comum"
+
+    # Verifica se as senhas são iguais
+    ok = False
+    while ok == False:
+        if senha == confirmaSenha:
+            pessoa = {"nome":nome, "cpf":cpf, "matricula":matricula, "telefone":telefone, "permissao":permissao, "senha":senha}
+            ok = True
+        else:
+            clear()
+            print("Senhas devem ser iguais!\n")
+            print("Digite seu Nome:",nome,"\nDigite seu CPF:",cpf,"\nDigite sua Matrícula:",matricula,"\nDigite seu Telefone:", telefone)
+            senha = getpass("Digite a Senha: ")
+            confirmaSenha = getpass("Confirme a Senha: ")
     
     # Exceção para caso o arquivo não exista
     try:
@@ -81,10 +147,14 @@ def cadastro():
         fw.close()
     
     print("\nCadastro Efetuado!")
+    sleep(2)
     menuUsuarioComum()
-                
+
+
+
 #Método para testes                
 def listaUsuarios():
+    clear()
     with open(f, "r") as fr:
         usuarios = json.loads(fr.read())
     fr.close()
@@ -95,32 +165,46 @@ def listaUsuarios():
         for user in usuarios:
             print(user["nome"] + "  " + user["matricula"])
 
+
+
 #Ler o arquivo
 def fileRead():
     with open(f, "r") as fr:
         usuarios = json.loads(fr.read())
     fr.close()
     return usuarios          
-            
-def login():
+
+
+
+
+def login(permissao):
     # retorno da leitura do arquivo
     usuarios = fileRead()
     logado = False
     name = input("Usuário: ")
-    key = input("Senha: ")
+    key = getpass("Senha: ")
 
-    # Verifica se o que foi digitado é igual ao que tenho guardado
-    for user in usuarios:
-        if name == user["nome"] and key == user["senha"]:
-            print("Bem vindo, " + user["nome"] + "!")
-            logado = user
-            break
+    # Verifica o tipo  de usuario e se o que foi digitado é igual ao que tenho guardado
+    if permissao == "Comum":
+        for user in usuarios:
+            if name == user["nome"] and key == user["senha"]:
+                print("Bem vindo, " + user["nome"] + "!")
+                logado = user
+                break
+    elif permissao == "Coordenador" or permissao == "Gestor de Recursos":
+        for user in usuarios:
+            if name == user["nome"] and key == user["senha"] and permissao == user["permissao"]:
+                print("Bem vindo, " + user["nome"] + "!")
+                logado = user
+                break
+        
 
-    #apenas para testes
     if logado:
         print(logado)
     else:
-        print("Usuário ou senha inválidos")
+        print("Usuário ou Senha Inválidos")
+        sleep(2)
+        principal()
             
    
         

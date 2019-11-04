@@ -1,0 +1,18 @@
+[
+    {
+        "nome": "coord",
+        "cpf": "78456935126",
+        "matricula": "45261663030",
+        "telefone": "83986555555",
+        "permissao": "Coordenador",
+        "senha": "456"
+    },
+    {
+        "nome": "gest",
+        "cpf": "78456935130",
+        "matricula": "45261664040",
+        "telefone": "83986444444",
+        "permissao": "Gestor de Recursos",
+        "senha": "123"
+    }
+]
