@@ -2,7 +2,7 @@ import json
 from getpass import getpass
 import os
 from time import sleep
-f = "./DataBase/db.json"
+f = "./Database/db.json"
 
 def main():
     clear()
@@ -62,7 +62,7 @@ def menuUsuarioComum():
         principal()
     else:
         print("\nOpção inválida! Tente novamente.")
-        sleep(1)
+        sleep(1.5)
         menuUsuarioComum()
 
 
@@ -130,20 +130,18 @@ def cadastroComum():
     # Exceção para caso o arquivo não exista
     try:
         # Lê o arquivo json e salva os valores no array usuarios.
-        fr = open(f, "r")
-        usuarios = json.loads(fr.read())
-        fr.close()
+        db = fileRead()
         # Adiciona a nova pessoa no array
-        usuarios.append(pessoa)
+        db["usuarios"].append(pessoa)
         # Salva o array atualizado no arquivo
         fw = open(f,"w+")
-        fw.write(json.dumps(usuarios, indent=4))
+        fw.write(json.dumps(db, indent=4))
         fw.close()
     except IOError:
         fw = open(f,"w+")
-        usuarios = []
-        usuarios.append(pessoa)
-        fw.write(json.dumps(usuarios, indent=4))
+        db["usuarios"] = []
+        db["usuarios"].append(pessoa)
+        fw.write(json.dumps(db, indent=4))
         fw.close()
     
     print("\nCadastro Efetuado!")
@@ -156,13 +154,13 @@ def cadastroComum():
 def listaUsuarios():
     clear()
     with open(f, "r") as fr:
-        usuarios = json.loads(fr.read())
+        db = json.loads(fr.read())
     fr.close()
 
-    if usuarios == []:
+    if db == []:
         print("\nNão há usuários cadastrados.")
     else:
-        for user in usuarios:
+        for user in db["usuarios"]:
             print(user["nome"] + "  " + user["matricula"])
 
 
@@ -170,29 +168,29 @@ def listaUsuarios():
 #Ler o arquivo
 def fileRead():
     with open(f, "r") as fr:
-        usuarios = json.loads(fr.read())
+        db = json.loads(fr.read())
     fr.close()
-    return usuarios          
+    return db          
 
 
 
 
 def login(permissao):
     # retorno da leitura do arquivo
-    usuarios = fileRead()
+    db = fileRead()
     logado = False
     name = input("Usuário: ")
     key = getpass("Senha: ")
 
     # Verifica o tipo  de usuario e se o que foi digitado é igual ao que tenho guardado
     if permissao == "Comum":
-        for user in usuarios:
+        for user in db["usuarios"]:
             if name == user["nome"] and key == user["senha"]:
                 print("Bem vindo, " + user["nome"] + "!")
                 logado = user
                 break
     elif permissao == "Coordenador" or permissao == "Gestor de Recursos":
-        for user in usuarios:
+        for user in db["usuarios"]:
             if name == user["nome"] and key == user["senha"] and permissao == user["permissao"]:
                 print("Bem vindo, " + user["nome"] + "!")
                 logado = user
