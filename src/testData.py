@@ -8,6 +8,7 @@ def main():
 
   strDatetime = str(dia) + "/" + str(mes) + "/" + str(ano) + " " + hora
 
+  #converte strings para o formato datetime
   data = datetime.strptime(strDatetime, "%d/%m/%Y %H:%M")
   print(data)
 

@@ -2,24 +2,23 @@ import json
 from getpass import getpass
 import os
 from time import sleep
-f = "./Database/db.json"
+f = "./database/db.json"
+
 
 def main():
     clear()
     principal()
 
 
-
 def clear():
     os.system("cls")
-
 
 
 def principal():
     clear()
     print("Bem vindo!")
     print("Qual menu deseja ver? ")
-    
+
     text = "\n1 - Usuário Comum. \n2 - Coordenador. \n3 - Gestor de Recursos. \n0 - Sair \nOpção: "
     opt = int(input(text))
 
@@ -29,10 +28,6 @@ def principal():
         menuCoordenador()
     elif opt == 3:
         menuGestorDeRecursos()
-    elif opt == 4:
-        cadastroComum()
-    elif opt == 5:
-        listaUsuarios()
     elif opt == 0:
         clear()
         print("Goodbye!")
@@ -43,14 +38,13 @@ def principal():
         print("\nOpção inválida! Tente novamente.")
         sleep(1)
         principal()
-    
 
 
 def menuUsuarioComum():
     clear()
     print("--Usuário--")
     print("Faça login ou Cadastre-se")
-    
+
     text = "\n1 - Cadastrar-se. \n2 - Entrar. \n0 - Voltar ao Menu Anterior \nOpção: "
     opt = int(input(text))
 
@@ -64,7 +58,6 @@ def menuUsuarioComum():
         print("\nOpção inválida! Tente novamente.")
         sleep(1.5)
         menuUsuarioComum()
-
 
 
 def menuCoordenador():
@@ -84,7 +77,6 @@ def menuCoordenador():
         menuCoordenador()
 
 
-
 def menuGestorDeRecursos():
     clear()
     print("--Gestor de Recursos--")
@@ -102,11 +94,24 @@ def menuGestorDeRecursos():
         menuGestorDeRecursos()
 
 
-
-            
 def cadastroComum():
     clear()
-    nome = input("Digite seu Nome: ")
+    db = fileRead()
+
+    nome = input("Digite seu nome completo: ")
+
+    usuario = input("Digite seu usuario: ")
+    # Verifica se usuario já existe
+    usuarioVerificado = False
+    while usuarioVerificado == False:
+        for usuarioDB in db["usuarios"]:
+            if usuario == usuarioDB["usuario"]:
+                print("Esse usuário já existe, tente outro.")
+                usuario = input("Digite seu usuario: ")
+                usuarioVerificado = False
+            else:
+                usuarioVerificado = True
+
     cpf = input("Digite seu CPF: ")
     matricula = input("Digite sua Matrícula: ")
     telefone = input("Digite seu Telefone: ")
@@ -115,95 +120,73 @@ def cadastroComum():
     permissao = "Comum"
 
     # Verifica se as senhas são iguais
-    ok = False
-    while ok == False:
+    senhaVerificada = False
+    while senhaVerificada == False:
         if senha == confirmaSenha:
-            pessoa = {"nome":nome, "cpf":cpf, "matricula":matricula, "telefone":telefone, "permissao":permissao, "senha":senha}
-            ok = True
+            #dados do usuario a cadastrar
+            pessoa = {"nome": nome, "usuario": usuario, "cpf": cpf, "matricula": matricula,
+                      "telefone": telefone, "permissao": permissao, "senha": senha, "reunioesProprietario": [], "reunioesConfirmadas": []}
+            senhaVerificada = True
         else:
             clear()
             print("Senhas devem ser iguais!\n")
-            print("Digite seu Nome:",nome,"\nDigite seu CPF:",cpf,"\nDigite sua Matrícula:",matricula,"\nDigite seu Telefone:", telefone)
+            print("Digite seu nome completo: ", nome, "\nDigite seu usuario: ", usuario, "\nDigite seu CPF: ", cpf,
+                  "\nDigite sua Matrícula: ", matricula, "\nDigite seu Telefone: ", telefone)
             senha = getpass("Digite a Senha: ")
             confirmaSenha = getpass("Confirme a Senha: ")
-    
+
     # Exceção para caso o arquivo não exista
     try:
-        # Lê o arquivo json e salva os valores no array usuarios.
-        db = fileRead()
-        # Adiciona a nova pessoa no array
         db["usuarios"].append(pessoa)
-        # Salva o array atualizado no arquivo
-        fw = open(f,"w+")
-        fw.write(json.dumps(db, indent=4))
-        fw.close()
     except IOError:
-        fw = open(f,"w+")
         db["usuarios"] = []
         db["usuarios"].append(pessoa)
-        fw.write(json.dumps(db, indent=4))
+    finally:
+        # Salva o db atualizado no arquivo
+        fw = open(f, "w+", encoding="utf-8")
+        fw.write(json.dumps(db, ensure_ascii=False, indent=4))
         fw.close()
-    
+
     print("\nCadastro Efetuado!")
     sleep(2)
     menuUsuarioComum()
 
 
-
-#Método para testes                
-def listaUsuarios():
-    clear()
-    with open(f, "r") as fr:
-        db = json.loads(fr.read())
-    fr.close()
-
-    if db == []:
-        print("\nNão há usuários cadastrados.")
-    else:
-        for user in db["usuarios"]:
-            print(user["nome"] + "  " + user["matricula"])
-
-
-
-#Ler o arquivo
+# Lê o arquivo
 def fileRead():
-    with open(f, "r") as fr:
+    with open(f, "r", encoding="utf-8") as fr:
         db = json.loads(fr.read())
     fr.close()
-    return db          
-
-
+    return db
 
 
 def login(permissao):
     # retorno da leitura do arquivo
     db = fileRead()
-    logado = False
-    name = input("Usuário: ")
-    key = getpass("Senha: ")
+    usuarioLogado = False
+    usuario = input("Usuário: ")
+    senha = getpass("Senha: ")
 
     # Verifica o tipo  de usuario e se o que foi digitado é igual ao que tenho guardado
     if permissao == "Comum":
-        for user in db["usuarios"]:
-            if name == user["nome"] and key == user["senha"]:
-                print("Bem vindo, " + user["nome"] + "!")
-                logado = user
+        for usuarioDB in db["usuarios"]:
+            if usuario == usuarioDB["usuario"] and senha == usuarioDB["senha"]:
+                print("Bem vindo, " + usuarioDB["nome"] + "!")
+                usuarioLogado = usuarioDB
                 break
     elif permissao == "Coordenador" or permissao == "Gestor de Recursos":
-        for user in db["usuarios"]:
-            if name == user["nome"] and key == user["senha"] and permissao == user["permissao"]:
-                print("Bem vindo, " + user["nome"] + "!")
-                logado = user
+        for usuarioDB in db["usuarios"]:
+            if usuario == usuarioDB["usuario"] and senha == usuarioDB["senha"] and permissao == usuarioDB["permissao"]:
+                print("Bem vindo, " + usuarioDB["nome"] + "!")
+                usuarioLogado = usuarioDB
                 break
-        
 
-    if logado:
-        print(logado)
+    if usuarioLogado:
+        print(usuarioLogado)
     else:
         print("Usuário ou Senha Inválidos")
         sleep(2)
         principal()
-            
-   
-        
+
+
 main()
