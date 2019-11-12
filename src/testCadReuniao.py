@@ -1,5 +1,4 @@
 import json
-import re
 from datetime import datetime
 
 f = "./database/db.json"
@@ -7,6 +6,7 @@ f = "./database/db.json"
 #falta relacionar usuario com a sua reunião
 #falta verificar se a sala está ocupada nos horários
 def cadReuniao(usuario):
+    # uso o usuario logado para ver quem criou a reunião
     usuarioLogado = usuario
     with open(f, "r", encoding="utf8") as fr:
         db = json.loads(fr.read())
@@ -15,15 +15,17 @@ def cadReuniao(usuario):
     dataCadastro = datetime.now().strftime("%d/%m/%Y %H:%M")
     tema = str(input("Tema da reunião ou ata:\n"))
     
-    #renderiza todas as salas de acordo com o banco, e verifica se está ocupada
+    # renderiza todas as salas de acordo com o banco, permite que o usuário escolha uma e verifica se está ocupada
     print("qual sala deseja escolher? ")
     for i, sala in enumerate(db["salas"]):
         print("("+str(i+1)+")", sala["sala"], sala["status"])
 
     sala = int(input(": ")) - 1
+
     while db["salas"][sala]["status"] == "Ocupada":
         print("Esta sala está ocupada, por favor escolha outra: ")
         sala = int(input(": ")) - 1
+
     print(db["salas"][sala]["sala"])
 
     data = str(input("Digite a data que será realizada no formato '03/08/2019':\n"))
@@ -34,6 +36,7 @@ def cadReuniao(usuario):
     dataFim = data + " " + horasFim
     participantes = []
 
+    # adicionando participantes a reunião
     resp = "S"
     while resp == "S":
         resp = input("Deseja adicionar um participante? [S/N]:\n" if len(participantes) == 0 else "Deseja adicionar mais um participante? [S/N]:\n").upper()
@@ -45,9 +48,12 @@ def cadReuniao(usuario):
                 if p["cpf"] == pCPF:
                     participante = {"nome": p["nome"], "cpf": p["cpf"], "telefone": p["telefone"]}
                     participantes.append(participante)
+                    print("Participante " + p["nome"] + " adicionado.")
+                    break
             else:
                 print("Participante não existe.")
 
+    # dict, object, json, já não sei mais como chamar isso...
     reuniao = {
         "tema": tema,
         "ata": ata,
@@ -65,6 +71,7 @@ def cadReuniao(usuario):
         db["reunioes"] = []
         db["reunioes"].append(reuniao)
     finally:
+        print("Reunião cadastrada com êxito! ")
         with open(f, "w+", encoding="utf8") as fw:
             fw.write(json.dumps(db, ensure_ascii=False, indent=4))
         fw.close()
