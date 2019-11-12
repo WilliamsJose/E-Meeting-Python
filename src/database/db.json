@@ -1,0 +1,82 @@
+{
+    "usuarios": [
+        {
+            "nome": "Carimbo Miguel",
+            "usuario": "coord",
+            "cpf": "78456935126",
+            "matricula": "45261663030",
+            "telefone": "83986555555",
+            "permissao": "Coordenador",
+            "senha": "456",
+            "reunioesConfirmadas": []
+        },
+        {
+            "nome": "Brucesfielde Porfírio",
+            "usuario": "gest",
+            "cpf": "78456935130",
+            "matricula": "45261664040",
+            "telefone": "83986444444",
+            "permissao": "Gestor de Recursos",
+            "senha": "123",
+            "reunioesConfirmadas": []
+        },
+        {
+            "nome": "Xerlaine Porfírio",
+            "usuario": "xerlaine123",
+            "cpf": "6789797",
+            "matricula": "98798798987",
+            "telefone": "9656465654",
+            "permissao": "Comum",
+            "senha": "321",
+            "reunioesProprietario": [],
+            "reunioesConfirmadas": []
+        },
+        {
+            "nome": "Xeroline Porfírio",
+            "usuario": "xequira",
+            "cpf": "654654",
+            "matricula": "654654",
+            "telefone": "654654",
+            "permissao": "Comum",
+            "senha": "321",
+            "reunioesProprietario": [],
+            "reunioesConfirmadas": []
+        }
+    ],
+    "reunioes": [
+        {
+            "tema": "teste",
+            "ata": "lsajkbfkjasdjkasdhsak",
+            "sala": "A 004",
+            "dataInicio": "22/05/2019 18:00",
+            "dataFim": "22/05/2019 21:30",
+            "dataDeCadastro": "11/11/2019 17:54",
+            "criadoPor": "williams",
+            "participantes": [
+                {
+                    "nome": "Xeroline Porfírio",
+                    "cpf": "654654",
+                    "telefone": "654654"
+                }
+            ]
+        }
+    ],
+    "salas": [
+        {
+            "sala": "Lab X",
+            "status": "Ocupada"
+        },
+        {
+            "sala": "A 004",
+            "status": "Disponível"
+        },
+        {
+            "sala": "A 003",
+            "status": "Disponível"
+        },
+        {
+            "sala": "Lab VI",
+            "status": "Disponível"
+        }
+    ]
+}
