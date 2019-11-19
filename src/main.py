@@ -3,6 +3,7 @@ import os
 from getpass import getpass
 from time import sleep
 from datetime import datetime
+from uuid import uuid1
 
 f = "./database/db.json"
 
@@ -19,23 +20,23 @@ def principal():
     print("Qual menu deseja ver? ")
 
     text = "\n(1) Usuário Comum. \n(2) Coordenador. \n(3) Gestor de Recursos. \n(0) Sair \n: "
-    opt = int(input(text))
+    opt = input(text)
 
-    if opt == 1:
+    if opt == "1":
         menuUsuarioComum()
-    elif opt == 2:
+    elif opt == "2":
         menuCoordenador()
-    elif opt == 3:
+    elif opt == "3":
         menuGestorDeRecursos()
-    elif opt == 0:
+    elif opt == "0":
         clear()
         print("Goodbye!")
-        sleep(1)
+        sleep(1.5)
         clear()
         exit
     else:
         print("\nOpção inválida! Tente novamente.")
-        sleep(1)
+        sleep(1.5)
         principal()
 
 
@@ -44,14 +45,14 @@ def menuUsuarioComum():
     print("--Usuário--")
     print("Faça login ou Cadastre-se")
 
-    text = "\n(1) Cadastrar-se. \n(2) Entrar. \n(0) Voltar ao Menu Anterior \nOpção: "
-    opt = int(input(text))
+    text = "\n(1) Cadastrar-se. \n(2) Entrar. \n(0) Voltar ao Menu Anterior \n: "
+    opt = input(text)
 
-    if opt == 1:
+    if opt == "1":
         cadastroComum()
-    elif opt == 2:
+    elif opt == "2":
         login("Comum")
-    elif opt == 0:
+    elif opt == "0":
         principal()
     else:
         print("\nOpção inválida! Tente novamente.")
@@ -62,43 +63,43 @@ def menuUsuarioComum():
 def menuCoordenador():
     clear()
     print("--Coordenador--")
-    text = "(1) Entrar. \n(0) Voltar ao Menu Anterior. \nOpção: "
+    text = "(1) Entrar. \n(0) Voltar ao Menu Anterior. \n: "
 
-    opt = int(input(text))
+    opt = input(text)
 
-    if opt == 1:
+    if opt == "1":
         login("Coordenador")
-    elif opt == 0:
+    elif opt == "0":
         principal()
     else:
         print("\nOpção inválida, Tente novamente.")
-        sleep(1)
+        sleep(1.5)
         menuCoordenador()
 
 
 def menuGestorDeRecursos():
     clear()
     print("--Gestor de Recursos--")
-    text = "(1) Entrar. \n(0) Voltar ao Menu Anterior. \nOpção: "
+    text = "(1) Entrar. \n(0) Voltar ao Menu Anterior. \n: "
 
-    opt = int(input(text))
+    opt = input(text)
 
-    if opt == 1:
+    if opt == "1":
         login("Gestor de Recursos")
-    elif opt == 0:
+    elif opt == "0":
         principal()
     else:
         print("\nOpção inválida, Tente novamente.")
-        sleep(1)
+        sleep(1.5)
         menuGestorDeRecursos()
 
 
 def usuarioComumLogado(u):
     clear()
     print("-----Tela usuário comum----- \nO que deseja fazer hoje?")
-    opt = int(input("(1) Cadastrar nova Reunião \n: "))
+    opt = input("(1) Cadastrar nova Reunião \n: ")
 
-    if opt == 1:
+    if opt == "1":
         cadastrarReuniao(u)
 
 
@@ -115,12 +116,12 @@ def gestorLogado(u):
 
 # <Métodos>
 def clear():
-    os.system("cls") if os.name == "nt" else os.system("clear")
+    os.system("cls || clear")
 
 
 # Lê o arquivo
 def fileRead():
-    with open(f, "r", encoding="utf-8") as fr:
+    with open(f, "r", encoding="utf8") as fr:
         db = json.loads(fr.read())
     fr.close()
     return db
@@ -167,7 +168,7 @@ def cadastroComum():
             senha = getpass("Digite a Senha: ")
             confirmaSenha = getpass("Confirme a Senha: ")
 
-    # Exceção para caso o arquivo não exista
+    # Exceção para caso não exista nenhum usuario
     try:
         db["usuarios"].append(pessoa)
     except IOError:
@@ -175,7 +176,7 @@ def cadastroComum():
         db["usuarios"].append(pessoa)
     finally:
         # Salva o db atualizado no arquivo
-        fw = open(f, "w+", encoding="utf-8")
+        fw = open(f, "w+", encoding="utf8")
         fw.write(json.dumps(db, ensure_ascii=False, indent=4))
         fw.close()
 
@@ -227,35 +228,46 @@ def cadastrarReuniao(u):
     fr.close()
 
     dataCadastro = datetime.now().strftime("%d/%m/%Y %H:%M")
+    idReuniao = str(uuid1())
 
-    tema = str(input("Tema da reunião ou ata \n:"))
+    tema = input("Tema da reunião ou ata \n:")
     clear()
     
     # renderiza todas as salas de acordo com o banco, permite que o usuário escolha uma e verifica se está ocupada
-    print("\nQual sala deseja escolher? ")
-    for i, sala in enumerate(db["salas"]):
-        print("("+str(i+1)+")", sala["sala"], sala["status"])
+    while True:
+        print("\nQual sala deseja escolher? ")
+        for i, sala in enumerate(db["salas"]):
+            print("("+str(i+1)+")", sala["sala"], sala["status"])
 
-    sala = int(input(": ")) - 1
+        sala = input(": ")
 
-    while db["salas"][sala]["status"] == "Ocupada":
-        print("Esta sala está ocupada, por favor escolha outra")
-        sala = int(input(": ")) - 1
+        try:
+            sala = int(sala) - 1
+            if db["salas"][sala]["status"] == "Ocupada":
+                print("\nEsta sala está ocupada, por favor escolha outra")
+                sleep(1.5)
+                clear()
+            else:
+                break
+        except ValueError as e:
+            print("\nErro: {}, por favor digite um número.".format(e))
+            sleep(3)
+            clear()
     
-    print(db["salas"][sala]["sala"])
-    sleep(1)
+    print("Sala escolhida: " + db["salas"][sala]["sala"])
+    sleep(1.5)
     clear()
 
-    data = str(input("\nDigite a data que será realizada no formato '03/08/2019' \n:"))
+    data = input("\nDigite a data que será realizada no formato '03/08/2019' \n:")
     clear()
 
-    horasInicio = str(input("\nDigite o horário de inicio no formato '21:00' \n:"))
+    horasInicio = input("\nDigite o horário de inicio no formato '21:00' \n:")
     clear()
 
-    horasFim = str(input("\nDigite o horário de fim no formato '21:00' \n:"))
+    horasFim = input("\nDigite o horário de fim no formato '21:00' \n:")
     clear()
 
-    ata = str(input("\nRedija sua ata \n:"))
+    ata = input("\nRedija sua ata \n:")
     clear()
 
     dataInicio = data + " " + horasInicio
@@ -270,22 +282,32 @@ def cadastrarReuniao(u):
         clear()
         resp = input("\nDeseja adicionar um participante? [S/N] \n:" if len(participantes) == 0 else "Deseja adicionar mais um participante? [S/N] \n:").upper()
         if resp == "S":
-            pCPF = input("Digite o cpf do participante: ")
+            pUsuario = input("Digite o Usuário do participante: ")
 
             #procura o participante no banco
             for p in db["usuarios"]:
-                if p["cpf"] == pCPF:
-                    participante = {"nome": p["nome"], "cpf": p["cpf"], "telefone": p["telefone"]}
+                if p["usuario"] == pUsuario:
+                    participante = {"nome": p["nome"], "usuario": p["usuario"], "telefone": p["telefone"]}
                     participantes.append(participante)
+
+                    # "notificando" o participante
+                    try:
+                        p["presencaRequerida"].append(idReuniao)
+                    except KeyError:
+                        p["presencaRequerida"] = []
+                        p["presencaRequerida"].append(idReuniao)
+
+                    clear()
                     print("Participante " + p["nome"] + " adicionado.")
-                    sleep(1)
+                    sleep(1.5)
                     break
             else:
                 print("Participante não existe.")
-                sleep(1)
+                sleep(1.5)
 
     # dict, object, json, já não sei mais como chamar isso...
     reuniao = {
+        "id": idReuniao,
         "tema": tema,
         "ata": ata,
         "sala": db["salas"][sala]["sala"],
@@ -296,6 +318,14 @@ def cadastrarReuniao(u):
         "participantes": participantes
     }
 
+    db["salas"][sala]["status"] = "Ocupada"
+
+    # guardando o id da reunião a ser cadastrada no usuario criador
+    for obj in db["usuarios"]:
+        if obj["usuario"] == usuarioLogado["usuario"]:
+            obj["reunioesProprietario"].append(idReuniao)
+
+    # Exceção caso não exista nenhuma reunião
     try:
         db["reunioes"].append(reuniao)
     except IOError:
@@ -303,14 +333,14 @@ def cadastrarReuniao(u):
         db["reunioes"].append(reuniao)
     finally:
         clear()
-        print("Reunião cadastrada com êxito! ")
-
         with open(f, "w+", encoding="utf8") as fw:
             fw.write(json.dumps(db, ensure_ascii=False, indent=4))
         fw.close()
 
+        print("Reunião cadastrada com êxito! ")
         sleep(1.5)
         
+        # volta a tela do usuario que está logado
         if usuarioLogado["permissao"] == "Comum":
             usuarioComumLogado(usuarioLogado)
         elif usuarioLogado["permissao"] == "Coordenador":
