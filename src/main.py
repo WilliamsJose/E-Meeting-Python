@@ -5,7 +5,7 @@ from time import sleep
 from datetime import datetime
 from uuid import uuid1
 
-f = "./database/db.json"
+f = "C:/Users/Williams/Desktop/E-Meeting-Python/database/db.json"
 
 
 def main():
