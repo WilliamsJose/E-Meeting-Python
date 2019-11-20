@@ -110,6 +110,10 @@ def usuarioComumLogado(u):
         print("reunioesConfirmadas()")
         sleep(1)
         usuarioComumLogado(u)
+    elif opt == "4":
+        print("atas()")
+        sleep(1)
+        usuarioComumLogado(u)
     elif opt == "0":
         exit()
     else:
@@ -186,7 +190,7 @@ def fileRead():
         fr.close()
         return db
     except IOError:
-        print("Erro na leitura do arquivo. " + IOError.__cause__)
+        print("Erro na leitura do arquivo. " + str(IOError))
 
 
 # Escreve no arquivo
@@ -196,7 +200,7 @@ def fileWrite(db):
             fw.write(json.dumps(db, ensure_ascii=False, indent=4))
         fw.close()
     except IOError:
-        print("Erro na gravação do arquivo. " + IOError.__cause__)
+        print("Erro na gravação do arquivo. " + str(IOError))
 
 
 def cadastroComum():
