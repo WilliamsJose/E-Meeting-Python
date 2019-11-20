@@ -33,7 +33,7 @@ def principal():
         print("Goodbye!")
         sleep(1.5)
         clear()
-        exit
+        exit()
     else:
         print("\nOpção inválida! Tente novamente.")
         sleep(1.5)
@@ -55,6 +55,7 @@ def menuUsuarioComum():
     elif opt == "0":
         principal()
     else:
+        clear()
         print("\nOpção inválida! Tente novamente.")
         sleep(1.5)
         menuUsuarioComum()
@@ -97,20 +98,78 @@ def menuGestorDeRecursos():
 def usuarioComumLogado(u):
     clear()
     print("-----Tela usuário comum----- \nO que deseja fazer hoje?")
-    opt = input("(1) Cadastrar nova Reunião \n: ")
+    opt = input("(1) Cadastrar nova Reunião \n(2) Confirmar ou Negar presença \n(3) Reuniões confirmadas \n(4) Atas \n: ")
 
     if opt == "1":
         cadastrarReuniao(u)
+    elif opt == "2":
+        print("simOuNaoReuniao()")
+        sleep(1)
+        usuarioComumLogado(u)
+    elif opt == "3":
+        print("reunioesConfirmadas()")
+        sleep(1)
+        usuarioComumLogado(u)
+    elif opt == "0":
+        exit()
+    else:
+        clear()
+        print("\nOpção inválida, Tente novamente.")
+        sleep(1.5)
+        usuarioComumLogado(u)
 
 
 def coordenadorLogado(u):
     clear()
-    print("Tela coordenador")
+    print("-----Tela Coordenador-----")
+    opt = input("(1) Criar reunião \n(2) Editar atas \n(3) Realocar reunião \n(4) Confirmar ou Negar presença \n(5) Reuniões confirmadas \n(0) Sair \n: ")
+
+    if opt == "1":
+        cadastrarReuniao(u)
+    elif opt == "2":
+        print("editarAta()")
+        sleep(1)
+        coordenadorLogado(u)
+    elif opt == "3":
+        print("realocarReuniao()")
+        sleep(1)
+        coordenadorLogado(u)
+    elif opt == "4":
+        print("simOuNaoReuniao()")
+        sleep(1)
+        coordenadorLogado(u)
+    elif opt == "5":
+        print("reunioesConfirmadas()")
+        sleep(1)
+        coordenadorLogado(u)
+    elif opt == "0":
+        exit()
+    else:
+        clear()
+        print("\nOpção inválida, Tente novamente.")
+        sleep(1.5)
+        coordenadorLogado(u)
 
 
 def gestorLogado(u):
     clear()
-    print("Tela gestor")
+    print("-----Tela Gestor-----")
+    opt = input("(1) Cadastrar novo espaço \n(2) Confirmar local de Reunião \n(0) Sair \n: ")
+
+    if opt == "1":
+        cadNovoEspaco(u)
+    elif opt == "2":
+        print("confirmarReuniao()")
+        sleep(1)
+        gestorLogado(u)
+    elif opt == "0":
+        exit()
+    else:
+        clear()
+        print("\nOpção inválida! Tente novamente.")
+        sleep(1.5)
+        gestorLogado(u)
+    
 
 # </Telas>
 
@@ -121,10 +180,23 @@ def clear():
 
 # Lê o arquivo
 def fileRead():
-    with open(f, "r", encoding="utf8") as fr:
-        db = json.loads(fr.read())
-    fr.close()
-    return db
+    try:        
+        with open(f, "r", encoding="utf8") as fr:
+            db = json.loads(fr.read())
+        fr.close()
+        return db
+    except IOError:
+        print("Erro na leitura do arquivo. " + IOError.__cause__)
+
+
+# Escreve no arquivo
+def fileWrite(db):
+    try:
+        with open(f, "w+", encoding="utf8") as fw:
+            fw.write(json.dumps(db, ensure_ascii=False, indent=4))
+        fw.close()
+    except IOError:
+        print("Erro na gravação do arquivo. " + IOError.__cause__)
 
 
 def cadastroComum():
@@ -171,7 +243,7 @@ def cadastroComum():
     # Exceção para caso não exista nenhum usuario
     try:
         db["usuarios"].append(pessoa)
-    except IOError:
+    except KeyError:
         db["usuarios"] = []
         db["usuarios"].append(pessoa)
     finally:
@@ -223,10 +295,9 @@ def cadastrarReuniao(u):
     # uso o usuario logado para ver quem criou a reunião
     usuarioLogado = u
 
-    with open(f, "r", encoding="utf8") as fr:
-        db = json.loads(fr.read())
-    fr.close()
+    db = fileRead()
 
+    # pega datahora atual e gera um id único
     dataCadastro = datetime.now().strftime("%d/%m/%Y %H:%M")
     idReuniao = str(uuid1())
 
@@ -328,15 +399,12 @@ def cadastrarReuniao(u):
     # Exceção caso não exista nenhuma reunião
     try:
         db["reunioes"].append(reuniao)
-    except IOError:
+    except KeyError:
         db["reunioes"] = []
         db["reunioes"].append(reuniao)
     finally:
         clear()
-        with open(f, "w+", encoding="utf8") as fw:
-            fw.write(json.dumps(db, ensure_ascii=False, indent=4))
-        fw.close()
-
+        fileWrite(db)
         print("Reunião cadastrada com êxito! ")
         sleep(1.5)
         
@@ -348,6 +416,50 @@ def cadastrarReuniao(u):
         else:
             gestorLogado(usuarioLogado)
     
+
+def cadNovoEspaco(u):
+    clear()
+    usuarioLogado = u
+
+    db = fileRead()
+
+    sala = input("Nome da sala \n: ")
+    clear()
+
+    while True:
+        disponivel = input("A sala já está disponível? [S/N] \n: ").upper()
+        clear()
+
+        if disponivel == "S":
+            status = "Disponível"
+            break
+        elif disponivel == "N":
+            status = "Ocupada"
+            break
+        else:
+            clear()
+            print("Opção inválida, tente novamente.")
+            sleep(1.5)
+            clear()
+
+    novoEspaco = {
+        "sala": sala,
+        "status": status
+    }
+
+    try:
+        db["salas"].append(novoEspaco)
+    except KeyError:
+        db["salas"] = []
+        db["salas"].append(novoEspaco)
+    finally:
+        clear()
+        fileWrite(db)
+        print("Novo espaço cadastrado com sucesso!")
+        sleep(1.5)
+        gestorLogado(usuarioLogado)
+
+
 # </Métodos>
 
 main()
