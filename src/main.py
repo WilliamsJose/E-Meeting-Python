@@ -7,11 +7,9 @@ from uuid import uuid1
 
 f = "C:/Users/Williams/Desktop/E-Meeting-Python/database/db.json"
 
-
 def main():
     clear()
     principal()
-
 
 # <Telas>
 def principal():
@@ -30,8 +28,6 @@ def principal():
         message("Opção inválida! Tente novamente.")
         principal()
 
-
-
 def usuarioComumLogado(u):
     message("-----Tela usuário comum----- \nO que deseja fazer hoje?")
     
@@ -40,8 +36,7 @@ def usuarioComumLogado(u):
     if opt == "1":
         cadastrarReuniao(u)
     elif opt == "2":
-        message("simOuNaoReuniao()") #temp
-        usuarioComumLogado(u)
+        presencaRequerida(u)
     elif opt == "3":
         message("reunioesConfirmadas()") #temp
         usuarioComumLogado(u)
@@ -53,7 +48,6 @@ def usuarioComumLogado(u):
     else:
         message("Opção inválida! Tente novamente.")
         usuarioComumLogado(u)
-
 
 def coordenadorLogado(u):
     message("-----Tela Coordenador-----")
@@ -69,7 +63,7 @@ def coordenadorLogado(u):
         message("realocarReuniao()") #temp
         coordenadorLogado(u)
     elif opt == "4":
-        message("simOuNaoReuniao()") #temp
+        message("presencaRequerida()") #temp
         coordenadorLogado(u)
     elif opt == "5":
         message("reunioesConfirmadas()") #temp
@@ -79,7 +73,6 @@ def coordenadorLogado(u):
     else:
         message("Opção inválida! Tente novamente.")
         coordenadorLogado(u)
-
 
 def gestorLogado(u):
     message("-----Tela Gestor-----")
@@ -97,13 +90,11 @@ def gestorLogado(u):
         message("Opção inválida! Tente novamente.")
         gestorLogado(u)
     
-
 # </Telas>
 
 # <Métodos>
 def clear():
     os.system("cls || clear")
-
 
 # Lê o arquivo
 def fileRead():
@@ -115,7 +106,6 @@ def fileRead():
     except IOError:
         print("Erro na leitura do arquivo. " + str(IOError))
 
-
 # Escreve no arquivo
 def fileWrite(db):
     try:
@@ -124,7 +114,6 @@ def fileWrite(db):
         fw.close()
     except IOError:
         print("Erro na gravação do arquivo. " + str(IOError))
-
 
 def welcome(nome):
     clear()
@@ -195,7 +184,6 @@ def cadastroComum():
         message("\nCadastro efetuado com sucesso!")
         principal()
 
-
 def login():
     clear()
     # retorno da leitura do arquivo
@@ -222,7 +210,6 @@ def login():
         message("Usuário ou Senha inválidos")
         principal()
 
-
 def cadastrarReuniao(u):
     clear()
     # uso o usuario logado para ver quem criou a reunião
@@ -241,7 +228,7 @@ def cadastrarReuniao(u):
     while True:
         message("\nQual sala deseja escolher? ")
         for i, sala in enumerate(db["salas"]):
-            print("("+str(i+1)+")", sala["sala"], sala["status"])
+            print("(" + str(i + 1) + ")", sala["sala"], sala["status"])
 
         sala = input(": ")
 
@@ -340,7 +327,6 @@ def cadastrarReuniao(u):
         else:
             gestorLogado(usuarioLogado)
     
-
 def cadNovoEspaco(u):
     clear()
     usuarioLogado = u
@@ -382,6 +368,78 @@ def cadNovoEspaco(u):
         sleep(1.5)
         gestorLogado(usuarioLogado)
 
+def presencaRequerida(u):
+    usuarioLogado = u
+
+    db = fileRead()
+
+    # obtém a reposta do usuário se vai partipar ou não da reunião escolhida
+    def decisao(r):
+        clear()
+        resp = input("Deseja participar dessa reunião? [S/N]").upper()
+        
+        if resp == "S":
+            definePresenca("Sim", r)
+        elif resp == "N":
+            definePresenca("Não", r)
+
+    # tentativa sem sucesso de mudar o status do participante para "sim" ou "não" na escolha de participar
+    def definePresenca(simOuNao, r):
+        for reuniao in db["reunioes"]:
+            if r["id"] == reuniao["id"]:
+                for p in reuniao["participantes"]:
+                    if usuarioLogado["usuario"] == p["usuario"]:
+                        p["comparecera"] = simOuNao
+                        message("Sucesso!")
+
+    def prMain():
+        # o try except aqui serve para verificar se a chave existe ou não no usuário atual
+        try:
+            clear()
+            while True:
+                reunioes = []
+
+                # mostra as reuniões para o usuário escolher qual vai responder participar ou não
+                for i, reuniaoID in enumerate(usuarioLogado["presencaRequerida"]):
+                    for reuniao in db["reunioes"]:
+                        if reuniaoID == reuniao["id"]:
+                            print(f"Tema: {reuniao['tema']}"
+                            +f"\nData: {reuniao['dataInicio']} - {reuniao['dataFim']}"
+                            +f"\nCriador: {reuniao['criadoPor']}"
+                            +f"\n({i + 1}) Escolher esta reunião\n")
+
+                            reunioes.append(reuniao)
+                else:
+                    if usuarioLogado["presencaRequerida"] == []:
+                        message("Você não tem nenhuma reunião pendente.")
+                        break
+                    print("(0) Voltar")
+
+                opcao = input(": ")
+
+
+                try:
+                    opcao = int(opcao) - 1
+                    if opcao != -1:
+                        decisao(reunioes[opcao])
+                        break
+                    else:
+                        usuarioComumLogado(usuarioLogado)
+                except ValueError as e:
+                    message(f"Erro: {e}, por favor digite um número.")
+                    sleep(1.5)
+        except KeyError:
+            message("Você não tem nenhuma reunião pendente.")
+        finally:
+            usuarioComumLogado(usuarioLogado)
+    
+    prMain()
+    
+# def reunioesConfirmadas(u):
+
+# def editarAta(u):
+
+# def realocarReuniao():
 
 # </Métodos>
 
