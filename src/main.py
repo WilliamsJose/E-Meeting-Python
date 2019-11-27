@@ -9,6 +9,31 @@ f = "C:/Users/Williams/Desktop/E-Meeting-Python/database/db.json"
 
 def main():
     clear()
+    #Cadastrar o primeiro coordenador e gestor
+    db = fileRead()
+    coord = {"nome": "Carimbo Miguel", "usuario": "coord", "cpf": "87705427087", "matricula": "72951317522", "telefone": "89220611348", "permissao": "Coordenador", "senha": "321", "reunioesConfirmadas": [], "presencaRequerida": []}
+    gest = {"nome": "Brucesfielde Porfírio", "usuario": "gest", "cpf": "78456935130", "matricula": "45261664040", "telefone": "83986444444", "permissao": "Gestor de Recursos", "senha": "321", "reunioesConfirmadas": [], "presencaRequerida": []}
+    try:
+        jaExisteCoord = 0
+        jaExisteGest = 0
+        for u in db["usuarios"]:
+            if coord["nome"] == u["nome"]:
+                jaExisteCoord = 1
+            elif gest["nome"] == u["nome"]:
+                jaExisteGest = 1
+
+        if jaExisteCoord == 0:     
+            db["usuarios"].append(coord)
+        if jaExisteGest == 0:
+            db["usuarios"].append(gest)
+    except KeyError:
+        db["usuarios"] = []
+        db["usuarios"].append(coord)
+        db["usuarios"].append(gest)
+    finally:
+        fileWrite(db)
+
+    #Finalmente inicia o programa para o usuario
     principal()
 
 # <Telas>
@@ -21,7 +46,7 @@ def principal():
     if opt == "1":
         login()
     elif opt == "2":
-        cadastroComum()
+        cadastroComum("Comum")
     elif opt == "0":
         exitProgram()
     else:
@@ -132,7 +157,7 @@ def message(msg):
     print(msg)
     sleep(1.5)
 
-def cadastroComum():
+def cadastroComum(permissao):
     clear()
     db = fileRead()
 
@@ -155,7 +180,6 @@ def cadastroComum():
     telefone = input("Digite seu Telefone: ")
     senha = getpass("Digite a Senha: ")
     confirmaSenha = getpass("Confirme a Senha: ")
-    permissao = "Comum"
 
     # Verifica se as senhas são iguais
     senhaVerificada = False
@@ -163,7 +187,7 @@ def cadastroComum():
         if senha == confirmaSenha:
             #dados do usuario a cadastrar
             pessoa = {"nome": nome, "usuario": usuario, "cpf": cpf, "matricula": matricula,
-                      "telefone": telefone, "permissao": permissao, "senha": senha, "reunioesProprietario": [], "reunioesConfirmadas": []}
+                      "telefone": telefone, "permissao": permissao, "senha": senha, "reunioesProprietario": [], "reunioesConfirmadas": [], "presencaRequerida": []}
             senhaVerificada = True
         else:
             message("Senhas devem ser iguais!\n")
@@ -216,6 +240,21 @@ def cadastrarReuniao(u):
     usuarioLogado = u
 
     db = fileRead()
+
+    def voltaAoInicioLogado():
+        if usuarioLogado["permissao"] == "Comum":
+            usuarioComumLogado(usuarioLogado)
+        elif usuarioLogado["permissao"] == "Coordenador":
+            coordenadorLogado(usuarioLogado)
+        else:
+            gestorLogado(usuarioLogado)
+
+    # caso ainda não tenha ao menos uma sala cadastrada no banco, para o programa e retorna ao inicio
+    try:
+        db["salas"]
+    except KeyError:
+        message("Ainda não há salas cadastradas, peça ao gestor de recursos para cadastrar uma nova")
+        voltaAoInicioLogado()
 
     # pega datahora atual e gera um id único
     dataCadastro = datetime.now().strftime("%d/%m/%Y %H:%M")
@@ -302,6 +341,7 @@ def cadastrarReuniao(u):
         "participantes": participantes
     }
 
+    #defino o status da sala escolhida como Ocupada
     db["salas"][sala]["status"] = "Ocupada"
 
     # guardando o id da reunião a ser cadastrada no usuario criador
@@ -320,12 +360,7 @@ def cadastrarReuniao(u):
         message("Reunião cadastrada com êxito! ")
         
         # volta a tela do usuario que está logado
-        if usuarioLogado["permissao"] == "Comum":
-            usuarioComumLogado(usuarioLogado)
-        elif usuarioLogado["permissao"] == "Coordenador":
-            coordenadorLogado(usuarioLogado)
-        else:
-            gestorLogado(usuarioLogado)
+        voltaAoInicioLogado()
     
 def cadNovoEspaco(u):
     clear()

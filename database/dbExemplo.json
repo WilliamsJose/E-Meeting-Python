@@ -1,0 +1,163 @@
+{
+    "usuarios": [
+        {
+            "nome": "Carimbo Miguel",
+            "usuario": "coord",
+            "cpf": "78456935126",
+            "matricula": "45261663030",
+            "telefone": "83986555555",
+            "permissao": "Coordenador",
+            "senha": "456",
+            "reunioesConfirmadas": [],
+            "presencaRequerida": [
+                "c739dba8-0aea-11ea-a98e-bc7737778fe8",
+                "30a2c88c-0c6b-11ea-b574-bc7737778fe8"
+            ]
+        },
+        {
+            "nome": "Brucesfielde Porfírio",
+            "usuario": "gest",
+            "cpf": "78456935130",
+            "matricula": "45261664040",
+            "telefone": "83986444444",
+            "permissao": "Gestor de Recursos",
+            "senha": "123",
+            "reunioesConfirmadas": []
+        },
+        {
+            "nome": "Xerlaine Porfírio",
+            "usuario": "xerlaine123",
+            "cpf": "6789797",
+            "matricula": "98798798987",
+            "telefone": "9656465654",
+            "permissao": "Comum",
+            "senha": "321",
+            "reunioesProprietario": [
+                "16c0f752-0ae6-11ea-8978-bc7737778fe8",
+                "3af253de-0ae6-11ea-95ee-bc7737778fe8"
+            ],
+            "reunioesConfirmadas": [],
+            "presencaRequerida": [
+                "c739dba8-0aea-11ea-a98e-bc7737778fe8",
+                "30a2c88c-0c6b-11ea-b574-bc7737778fe8"
+            ]
+        },
+        {
+            "nome": "Xeroline Porfírio",
+            "usuario": "xequira",
+            "cpf": "654654",
+            "matricula": "654654",
+            "telefone": "654654",
+            "permissao": "Comum",
+            "senha": "321",
+            "reunioesProprietario": [
+                "c739dba8-0aea-11ea-a98e-bc7737778fe8",
+                "30a2c88c-0c6b-11ea-b574-bc7737778fe8"
+            ],
+            "reunioesConfirmadas": []
+        },
+        {
+            "nome": "Williams J",
+            "usuario": "will",
+            "cpf": "123456789",
+            "matricula": "987654321",
+            "telefone": "00000000000",
+            "permissao": "Comum",
+            "senha": "123",
+            "reunioesProprietario": [],
+            "reunioesConfirmadas": []
+        }
+    ],
+    "reunioes": [
+        {
+            "id": "16c0f752-0ae6-11ea-8978-bc7737778fe8",
+            "tema": "teste",
+            "ata": "teste",
+            "sala": "Lab VI",
+            "dataInicio": "19/11/2019 13:00",
+            "dataFim": "19/11/2019 14:00",
+            "dataDeCadastro": "19/11/2019 13:03",
+            "criadoPor": "Xerlaine Porfírio",
+            "participantes": [
+                {
+                    "nome": "Carimbo Miguel",
+                    "usuario": "coord",
+                    "telefone": "83986555555"
+                }
+            ]
+        },
+        {
+            "id": "3af253de-0ae6-11ea-95ee-bc7737778fe8",
+            "tema": "teste2",
+            "ata": "teste2",
+            "sala": "A 004",
+            "dataInicio": "19/11/2019 15:00",
+            "dataFim": "19/11/2019 16:00",
+            "dataDeCadastro": "19/11/2019 13:04",
+            "criadoPor": "Xerlaine Porfírio",
+            "participantes": []
+        },
+        {
+            "id": "c739dba8-0aea-11ea-a98e-bc7737778fe8",
+            "tema": "teste3",
+            "ata": "teste3",
+            "sala": "Lab X",
+            "dataInicio": "513 51",
+            "dataFim": "513 5",
+            "dataDeCadastro": "19/11/2019 13:36",
+            "criadoPor": "Xeroline Porfírio",
+            "participantes": [
+                {
+                    "nome": "Carimbo Miguel",
+                    "usuario": "coord",
+                    "telefone": "83986555555"
+                },
+                {
+                    "nome": "Xerlaine Porfírio",
+                    "usuario": "xerlaine123",
+                    "telefone": "9656465654"
+                }
+            ]
+        },
+        {
+            "id": "30a2c88c-0c6b-11ea-b574-bc7737778fe8",
+            "tema": "teste",
+            "ata": "teste",
+            "sala": "A 003",
+            "dataInicio": "0 0",
+            "dataFim": "0 0",
+            "dataDeCadastro": "21/11/2019 11:28",
+            "criadoPor": "Xeroline Porfírio",
+            "participantes": [
+                {
+                    "nome": "Xerlaine Porfírio",
+                    "usuario": "xerlaine123",
+                    "telefone": "9656465654"
+                },
+                {
+                    "nome": "Carimbo Miguel",
+                    "usuario": "coord",
+                    "telefone": "83986555555"
+                }
+            ]
+        }
+    ],
+    "salas": [
+        {
+            "sala": "Lab X",
+            "status": "Ocupada"
+        },
+        {
+            "sala": "A 004",
+            "status": "Ocupada"
+        },
+        {
+            "sala": "A 003",
+            "status": "Ocupada"
+        },
+        {
+            "sala": "Lab VI",
+            "status": "Ocupada"
+        }
+    ]
+}
